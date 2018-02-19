@@ -4,6 +4,7 @@ import socket
 import sqlite3
 import sys
 from threading import Thread
+from multiprocessing import Process
 # import Error
 
 def SendDDLToNode(ddlSQL, dbhost, dbport, nodeNum, catDbName, nodeDbName):
@@ -126,8 +127,11 @@ def Main():
             nodeDbName = configDict['node' + str(currentNodeNum) + '.db']
 
             # print('will connect to node' + str(currentNodeNum) + ' at IP:' + dbhost + ' and port:' + str(dbport))
-            t = Thread(target=SendDDLToNode, args=(ddlSQL, dbhost, dbport, currentNodeNum, catDbName, nodeDbName, ))
-            t.start()
+            # t = Thread(target=SendDDLToNode, args=(ddlSQL, dbhost, dbport, currentNodeNum, catDbName, nodeDbName, ))
+            # t.start()
+            p = Process(target=SendDDLToNode, args=(ddlSQL, dbhost, dbport, currentNodeNum, catDbName, nodeDbName, ))
+            p.start()
+            p.join()
     else:
           print(__file__ + ': ERROR need at least 3 arguments to run properly (e.g. \"python3 runDDL.py cluster.cfg plants.sql\"')
 
