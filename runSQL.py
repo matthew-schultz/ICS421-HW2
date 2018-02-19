@@ -1,11 +1,10 @@
 # runDDL.py
 import configparser
+import multiprocessing
+import pickle
 import socket
 import sqlite3
 import sys
-# from threading import Thread
-import multiprocessing
-from multiprocessing import Process
 # import Error
 
 def SendDDLToNode(ddlSQL, dbhost, dbport, nodeNum, catDbName, nodeDbName):
@@ -17,9 +16,13 @@ def SendDDLToNode(ddlSQL, dbhost, dbport, nodeNum, catDbName, nodeDbName):
         listToBePickled = []
         listToBePickled.append(nodeDbName)
         listToBePickled.append(ddlSQL)
-        packet = '<dbname>' + nodeDbName + '</dbname>' + ddlSQL
-        print('runDDL.py: send data "' + packet + '"')
-        mySocket.send(packet.encode())
+        data_string = pickle.dumps(listToBePickled)
+        # packet = '<dbname>' + nodeDbName + '</dbname>' + ddlSQL
+        # print('runDDL.py: send data "' + packet + '"')
+        print('runDDL.py: send pickled data_array "' + '[%s]' % ', '.join(map(str, listToBePickled)) + '"')   
+        # mySocket.send(packet.encode())
+        mySocket.send(data_string)
+
         data = str(mySocket.recv(1024).decode())
         print('runDDL.py: recv ' + data + ' from host ' + dbhost)
 

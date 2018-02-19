@@ -1,4 +1,5 @@
 #parDBD.py
+import pickle
 import socket
 import sqlite3
 import sys
@@ -24,17 +25,28 @@ def Main():
 
         mySocket = socket.socket()
         mySocket.bind((host,port))
-
         mySocket.listen(1)
         runDDLConn, addr = mySocket.accept()
         print ("parDBd: Connection from " + str(addr))
-        packet = runDDLConn.recv(1024).decode()
-        if not packet:
-            return
-        print ("parDBd: recv " + str(packet))
-        dbfilename = GetDbFilename(packet)
+        # packet = runDDLConn.recv(1024).decode()
+        data = runDDLConn.recv(1024)
+        data_arr = pickle.loads(data)
+        print('Received' + repr(data_arr))
+        # while 1:
+#            data = runDDLConn.recv(1024)
+#            data_arr = pickle.loads(data)
+#            print('Received' + repr(data_arr))                        
+#            if not data: 
+                # runDDLConn.close()
+                # mySocket.close()
+#                break        
+        # if not packet:
+        #    return
+        # print ("parDBd: recv " + str(packet))
+
+        dbfilename = ''# GetDbFilename(packet)
         print('dbfilename is ' + dbfilename)
-        ddlSQL = GetSQL(packet)
+        ddlSQL = ''# GetSQL(packet)
 
         sqlConn = sqlite3.connect(dbfilename)
         c = sqlConn.cursor()
@@ -65,9 +77,10 @@ def Main():
 
 
 if __name__ == '__main__':
-    try:
-        Main()
-    except OSError as e:
-        print('failed due to OSError; please retry in a minute\n' + str(e))
-
-
+     Main()
+#    try:
+#        Main()
+# except OSError as e:
+#    print('failed due to OSError; please retry in a minute\n' + str(e))
+# except OSError as e:
+#    print('failed due to OSError; please retry in a minute\n' + str(e))
