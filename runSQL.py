@@ -1,9 +1,9 @@
-#runDDL.py
+# runDDL.py
 import configparser
 import socket
 import sqlite3
 import sys
-from threading import Thread
+# from threading import Thread
 import multiprocessing
 from multiprocessing import Process
 # import Error
@@ -14,6 +14,9 @@ def SendDDLToNode(ddlSQL, dbhost, dbport, nodeNum, catDbName, nodeDbName):
     mySocket = socket.socket()
     try:
         mySocket.connect((dbhost, dbport))
+        listToBePickled = []
+        listToBePickled.append(nodeDbName)
+        listToBePickled.append(ddlSQL)
         packet = '<dbname>' + nodeDbName + '</dbname>' + ddlSQL
         print('runDDL.py: send data "' + packet + '"')
         mySocket.send(packet.encode())
