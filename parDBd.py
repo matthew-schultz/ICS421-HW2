@@ -5,17 +5,24 @@ import sqlite3
 import sys
 #import sqlite3.OperationalError
 
-def GetDbFilename(packet):
-    filename = ''
-    filename = packet.split('</dbname>')[0]
-    filename = filename.split('<dbname>')[1]
-    return filename
 
+# Create table
+def CreateTable(dbfilename, ddlSQL):
+    sqlConn = sqlite3.connect(dbfilename)
+    c = sqlConn.cursor()
+    tableCreatedMsg = ''
+    try:
+       c.execute(ddlSQL)
+    except sqlite3.OperationalError as e:
+       print(e)
+       tableCreatedMsg = 'failure'
+    else:
+        tableCreatedMsg = 'success'
+    c.close()
+    sqlConn.commit()
+    sqlConn.close()
+    return tableCreatedMsg
 
-def GetSQL(packet):
-     sql = ''
-     sql = packet.split('</dbname>')[1]
-     return sql
 
 def Main():
     if(len(sys.argv) >= 3):
@@ -28,43 +35,19 @@ def Main():
         mySocket.listen(1)
         runDDLConn, addr = mySocket.accept()
         print ("parDBd: Connection from " + str(addr))
-        # packet = runDDLConn.recv(1024).decode()
         data = runDDLConn.recv(1024)
+        # return from Main() if no data was received
+        if not data:
+            return
         data_arr = pickle.loads(data)
         print('Received' + repr(data_arr))
-        # while 1:
-#            data = runDDLConn.recv(1024)
-#            data_arr = pickle.loads(data)
-#            print('Received' + repr(data_arr))                        
-#            if not data: 
-                # runDDLConn.close()
-                # mySocket.close()
-#                break        
-        # if not packet:
-        #    return
-        # print ("parDBd: recv " + str(packet))
 
-        dbfilename = ''# GetDbFilename(packet)
+        dbfilename = data_arr[0]
         print('dbfilename is ' + dbfilename)
-        ddlSQL = ''# GetSQL(packet)
+        ddlSQL = data_arr[1]
+        print ('ddlSQL is ' + ddlSQL)
 
-        sqlConn = sqlite3.connect(dbfilename)
-        c = sqlConn.cursor()
-
-    # Create table
-        tableCreatedMsg = ''
-        try:
-            c.execute(ddlSQL)
-        except sqlite3.OperationalError as e:
-            print(e)
-            tableCreatedMsg = 'failure'
-        else:
-            tableCreatedMsg = 'success'
-        c.close()
-        sqlConn.commit()
-        sqlConn.close()
-
-        response = tableCreatedMsg
+        response = CreateTable(dbfilename, ddlSQL)
         print(response)
 
         print ('parDBd: send response "' + str(response) +  '" for sql "' + str(ddlSQL) + '"')
@@ -77,10 +60,7 @@ def Main():
 
 
 if __name__ == '__main__':
-     Main()
-#    try:
-#        Main()
-# except OSError as e:
-#    print('failed due to OSError; please retry in a minute\n' + str(e))
-# except OSError as e:
-#    print('failed due to OSError; please retry in a minute\n' + str(e))
+    try:
+        Main()
+    except OSError as e:
+        print('failed due to OSError; please retry in a minute\n' + str(e))
