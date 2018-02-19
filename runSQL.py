@@ -4,6 +4,7 @@ import socket
 import sqlite3
 import sys
 from threading import Thread
+import multiprocessing
 from multiprocessing import Process
 # import Error
 
@@ -120,6 +121,10 @@ def Main():
         print(__file__ + ': CreateCatalog() returned: ' + catMsg)
 
         print('catalog filename is ' + catDbName)
+
+        #create a pool of resources, allocating one resource for each node
+        pool = multiprocessing.Pool(int(configDict['numnodes']))
+        sendDDLToNodeResponse = []
         #CreateDatabase(3,  ddlSQL)
         for currentNodeNum in range(1, int(configDict['numnodes']) + 1):
             dbhost = configDict['node' + str(currentNodeNum) + '.hostname']
@@ -129,9 +134,12 @@ def Main():
             # print('will connect to node' + str(currentNodeNum) + ' at IP:' + dbhost + ' and port:' + str(dbport))
             # t = Thread(target=SendDDLToNode, args=(ddlSQL, dbhost, dbport, currentNodeNum, catDbName, nodeDbName, ))
             # t.start()
-            p = Process(target=SendDDLToNode, args=(ddlSQL, dbhost, dbport, currentNodeNum, catDbName, nodeDbName, ))
-            p.start()
-            p.join()
+            # p = Process(target=SendDDLToNode, args=(ddlSQL, dbhost, dbport, currentNodeNum, catDbName, nodeDbName, ))
+            # p.start()
+            # p.join()
+            sendDDLToNodeResponse.append(pool.apply_async(SendDDLToNode, (ddlSQL, dbhost, dbport, currentNodeNum, catDbName, nodeDbName, )))
+        for currentNodeNum in range(1, int(configDict['numnodes']) + 1):
+            sendDDLToNodeResponse.pop(0).get()
     else:
           print(__file__ + ': ERROR need at least 3 arguments to run properly (e.g. \"python3 runDDL.py cluster.cfg plants.sql\"')
 
