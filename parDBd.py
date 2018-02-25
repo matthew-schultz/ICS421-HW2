@@ -36,26 +36,26 @@ def Main():
         mySocket.bind((host,port))
         mySocket.listen(1)
         runDDLConn, addr = mySocket.accept()
-        print ("parDBd: Connection from " + str(addr))
+        print (__file__ + ': Connection from ' + str(addr))
         data = runDDLConn.recv(1024)
         # return from Main() if no data was received
         if not data:
             return
         data_arr = pickle.loads(data)
-        print('Received' + repr(data_arr))
+        print(__file__ + ': Received' + repr(data_arr))
 
         dbfilename = data_arr[0]
-        print('dbfilename is ' + dbfilename)
+        print(__file__ + ': dbfilename is ' + dbfilename)
         ddlSQL = data_arr[1]
-        print ('ddlSQL is ' + ddlSQL)
+        print (__file__ + ': ddlSQL is ' + ddlSQL)
 
-        sql_driver.run_sql(ddlSQL, dbfilename)
+        sql_response = sql_driver.run_sql(ddlSQL, dbfilename)
 
-        response = ''#CreateTable(dbfilename, ddlSQL)
-        print(response)
+        # response = ''#CreateTable(dbfilename, ddlSQL)
+        print('parDBd: response is ' + sql_response)
 
-        print ('parDBd: send response "' + str(response) +  '" for sql "' + str(ddlSQL) + '"')
-        runDDLConn.send(response.encode())
+        print ('parDBd: send response "' + str(sql_response) +  '" for sql "' + str(ddlSQL) + '"')
+        runDDLConn.send(sql_response.encode())
 
         runDDLConn.close()
         mySocket.close()

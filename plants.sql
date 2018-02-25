@@ -1,1 +1,1 @@
-SELECT * FROM plants;
+beet sqad

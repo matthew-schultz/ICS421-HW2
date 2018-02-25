@@ -124,13 +124,14 @@ class SQLDriver:
             result = str(c.fetchall())
             sqlConn.commit()
             sqlConn.close()
-            print(result)
+            # print(result)
             return result
         except sqlite3.IntegrityError as e:
             print(e)
+            return 'failure'
         except sqlite3.OperationalError as e:
             print(e)
-
+            return 'failure'
 
     def send_node_sql(self, node_sql, dbhost, dbport, node_num, cat_db, node_db):
         print(self.caller_file + ' connecting to host ' + dbhost)
@@ -148,6 +149,9 @@ class SQLDriver:
 
             data = str(my_socket.recv(1024).decode())
             print(self.caller_file + ' recv ' + data + ' from host ' + dbhost)
+
+            # get response list from parDBd
+            
 
             if(data == 'success'):
                 tname = self.get_table_name(node_sql)
