@@ -22,8 +22,8 @@ class SQLDriver:
     def create_catalog(self, dbname):
         sqlConn = sqlite3.connect(dbname)
         c = sqlConn.cursor()
-        # catSQL = 'DROP TABLE dtables;\n'
-        catSQL = '''CREATE TABLE IF not exists dtables(tname char(32), 
+        # cat_sql = 'DROP TABLE dtables;\n'
+        cat_sql = '''CREATE TABLE IF not exists dtables(tname char(32), 
                 nodedriver char(64), 
                 nodeurl char(128), 
                 nodeuser char(16), 
@@ -37,7 +37,7 @@ class SQLDriver:
         # Create table
         tableCreatedMsg = ''
         try:
-            c.execute(catSQL)
+            c.execute(cat_sql)
         except Error:
             tableCreatedMsg = 'failure'
         else:
@@ -129,39 +129,37 @@ class SQLDriver:
             print(e)
 
 
-    def send_node_sql(self, node_sql, dbhost, dbport, node_num, cat_db, nodeDbName):
+    def send_node_sql(self, node_sql, dbhost, dbport, node_num, cat_db, node_db):
         print('runDDL.py: connecting to host ' + dbhost)
 
-        mySocket = socket.socket()
+        my_socket = socket.socket()
         try:
-            mySocket.connect((dbhost, dbport))
-            listToBePickled = []
-            listToBePickled.append(nodeDbName)
-            listToBePickled.append(node_sql)
-            data_string = pickle.dumps(listToBePickled)
-            # packet = '<dbname>' + nodeDbName + '</dbname>' + node_sql
-            # print('runDDL.py: send data "' + packet + '"')
-            print('runDDL.py: send pickled data_array "' + '[%s]' % ', '.join(map(str, listToBePickled)) + '"')   
-            # mySocket.send(packet.encode())
-            mySocket.send(data_string)
+            my_socket.connect((dbhost, dbport))
+            req_to_pickle = []
+            req_to_pickle.append(node_db)
+            req_to_pickle.append(node_sql)
+            data_string = pickle.dumps(req_to_pickle)
+            print('runDDL.py: send pickled data_array "' + '[%s]' % ', '.join(map(str, req_to_pickle)) + '"')   
+            # my_socket.send(packet.encode())
+            my_socket.send(data_string)
 
-            data = str(mySocket.recv(1024).decode())
+            data = str(my_socket.recv(1024).decode())
             print('runDDL.py: recv ' + data + ' from host ' + dbhost)
 
             if(data == 'success'):
                 tname = self.get_table_name(node_sql)
                 # print('tname is ' + tname)
-                catSQL = 'DELETE FROM dtables WHERE nodeid='+ str(node_num) + ';'            
+                cat_sql = 'DELETE FROM dtables WHERE nodeid='+ str(node_num) + ';'            
                 if self.table_is_created(node_sql):
                     # print ('node_sql is a create statement')
-                    # catSQL = 'TRUNCATE TABLE tablename;'
-                    catSQL = 'INSERT INTO dtables VALUES ("'+ tname +'","","' + dbhost + '","","",0,' + str(node_num) + ',NULL,NULL,NULL)'
-                self.run_sql(catSQL, cat_db)
-                # print('runDDL.py: ' + catSQL)
+                    # cat_sql = 'TRUNCATE TABLE tablename;'
+                    cat_sql = 'INSERT INTO dtables VALUES ("'+ tname +'","","' + dbhost + '","","",0,' + str(node_num) + ',NULL,NULL,NULL)'
+                self.run_sql(cat_sql, cat_db)
+                # print('runDDL.py: ' + cat_sql)
                 # print('')
         except OSError:
             print('runDDL.py: failed to connect to host ' + dbhost)
-        mySocket.close()
+        my_socket.close()
 
 
     def table_is_created(self, sql):
