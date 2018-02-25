@@ -14,12 +14,18 @@ def main():
         clustercfg = sys.argv[1]
         node_sql = sys.argv[2]
 
-        sql_driver = SQLDriver.SQLDriver()
-        cfg_dict = sql_driver.get_cfg_dict()
+        sql_driver = SQLDriver.SQLDriver(__file__)
+        cfg_dict = sql_driver.get_cfg_dict(clustercfg)
 
         #read ddlfile as a string to be executed as sql
         with open(node_sql, 'r') as myfile:
-            ddlSQL=myfile.read().replace('\n', '')
+            node_sql = myfile.read().replace('\n', '')
+
+        cat_db_name = cfg_dict['catalog.db']
+        cat_msg = sql_driver.create_catalog(cat_db_name)
+        print(__file__ + ': create_catalog() returned: ' + cat_msg)
+
+
 
     else:
           print(__file__ + ': ERROR need at least 3 arguments to run properly (e.g. \"python3 runSQL.py cluster.cfg books.sql\"')

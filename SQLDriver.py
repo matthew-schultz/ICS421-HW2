@@ -8,14 +8,42 @@ import sys
 # import Error
 
 class SQLDriver:
-#    def __init__(self):
-#        self.data = []
+    def __init__(self, caller_file):
+        self.caller_file = caller_file
+        print(self.caller_file)
 
-    def get_cfg_dict(self):
+    def create_catalog(self, dbname):
+        sqlConn = sqlite3.connect(dbname)
+        c = sqlConn.cursor()
+        # catSQL = 'DROP TABLE dtables;\n'
+        catSQL = '''CREATE TABLE IF not exists dtables(tname char(32), 
+                nodedriver char(64), 
+                nodeurl char(128), 
+                nodeuser char(16), 
+                nodepasswd char(16), 
+                partmtd int, 
+                nodeid int, 
+                partcol char(32), 
+                partparam1 char(32),
+                partparam2 char(32),
+                CONSTRAINT unique_nodeid UNIQUE(nodeid))'''
+        # Create table
+        tableCreatedMsg = ''
+        try:
+            c.execute(catSQL)
+        except Error:
+            tableCreatedMsg = 'failure'
+        else:
+            tableCreatedMsg = 'success'
+        sqlConn.commit()
+        sqlConn.close()
+        return tableCreatedMsg
+
+    def _get_cfg_dict(self):
         print('getting cfg_dict')
 
-    def parse_cfg(self, clustercfg):
-        print(__file__ +': reading config file "' + clustercfg + '"')
+    def get_cfg_dict(self, clustercfg):
+        print(self.caller_file +': reading config file "' + clustercfg + '"')
         file = open(clustercfg)
         content = file.read()
         config_array = content.split("\n")
@@ -46,7 +74,7 @@ class SQLDriver:
             '''#configList.append(c)[1]
                     print (c[0] + '=' + c[1])
                     config_dict[c[0]] = c[1]'''
-        print(__file__ +': config file "' + clustercfg + '" read successfully')
+        print(self.caller_file +': config file "' + clustercfg + '" read successfully')
         file.close()
         return config_dict
 
