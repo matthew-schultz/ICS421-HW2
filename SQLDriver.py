@@ -8,8 +8,9 @@ import sys
 # import Error
 
 class SQLDriver:
-    def __init__(self, caller_file):
+    def __init__(self, caller_file, cfg_dict):
         self.caller_file = caller_file
+        self.cfg_dict = get_cfg_dict(self, clustercfg)
         print(self.caller_file)
 
     def create_catalog(self, dbname):
@@ -78,6 +79,9 @@ class SQLDriver:
         file.close()
         return config_dict
 
+    def multiprocess_node_sql():
+
+
     def run_sql(self, sql, dbname):
         print('runDDL.py: executing sql statement ' + sql) 
         try:
@@ -92,4 +96,4 @@ class SQLDriver:
         except sqlite3.OperationalError as e:
             print(e)
 
-
+    def send_node_sql(self, )
