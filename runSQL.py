@@ -13,9 +13,7 @@ def main():
         print('executing runSQL')
         clustercfg = sys.argv[1]
         node_sql = sys.argv[2]
-
         sql_driver = SQLDriver.SQLDriver(__file__, clustercfg)
-#        cfg_dict = sql_driver.get_cfg_dict(clustercfg)
 
         #read ddlfile as a string to be executed as sql
         with open(node_sql, 'r') as myfile:

@@ -85,6 +85,21 @@ class SQLDriver:
         file.close()
         return config_dict
 
+    def get_table_name(self, data):
+        tname = ''
+        
+        dataArray = data.split(' ')
+        count = 0
+        for d in dataArray:
+            if d.upper() == 'TABLE':
+                # check if table name will come after an 'if exists...' statement
+                if dataArray[count + 1] == 'if':
+                     tname = dataArray[count+4]
+                else: tname = dataArray[count + 1]
+            count = count + 1   
+        tname = tname.split('(')[0] #remove trailing '('
+        return tname
+
 
     def multiprocess_node_sql(self, node_sql, cat_db_name):   
         # create a pool of resources, allocating one resource for each node
@@ -134,16 +149,25 @@ class SQLDriver:
             print('runDDL.py: recv ' + data + ' from host ' + dbhost)
 
             if(data == 'success'):
-                tname = getTname(ddlSQL)
+                tname = self.get_table_name(ddlSQL)
                 # print('tname is ' + tname)
                 catSQL = 'DELETE FROM dtables WHERE nodeid='+ str(nodeNum) + ';'            
-                if SQLIsCreate(ddlSQL):
+                if self.table_is_created(ddlSQL):
                     # print ('ddlSQL is a create statement')
                     # catSQL = 'TRUNCATE TABLE tablename;'
                     catSQL = 'INSERT INTO dtables VALUES ("'+ tname +'","","' + dbhost + '","","",0,' + str(nodeNum) + ',NULL,NULL,NULL)'
-                RunSQL(catSQL, catDbName)
+                self.run_sql(catSQL, catDbName)
                 # print('runDDL.py: ' + catSQL)
                 # print('')
         except OSError:
             print('runDDL.py: failed to connect to host ' + dbhost)
         mySocket.close()
+
+
+    def table_is_created(self, sql):
+        isInsert = False
+        # remove leading whitespace from sql string and split
+        sqlArray = sql.lstrip().split(" ")
+        if sqlArray[0].upper() == 'CREATE':
+            isInsert = True
+        return isInsert
