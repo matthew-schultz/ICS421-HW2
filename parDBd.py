@@ -3,6 +3,7 @@ import pickle
 import socket
 import sqlite3
 import sys
+import SQLDriver
 #import sqlite3.OperationalError
 
 
@@ -26,6 +27,7 @@ def CreateTable(dbfilename, ddlSQL):
 
 def Main():
     if(len(sys.argv) >= 3):
+        sql_driver = SQLDriver.SQLDriver(__file__, None)
         host = sys.argv[1]
         #host = ''
         port = int(sys.argv[2])
@@ -47,7 +49,9 @@ def Main():
         ddlSQL = data_arr[1]
         print ('ddlSQL is ' + ddlSQL)
 
-        response = CreateTable(dbfilename, ddlSQL)
+        sql_driver.run_sql(ddlSQL, dbfilename)
+
+        response = ''#CreateTable(dbfilename, ddlSQL)
         print(response)
 
         print ('parDBd: send response "' + str(response) +  '" for sql "' + str(ddlSQL) + '"')

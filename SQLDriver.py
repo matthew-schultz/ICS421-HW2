@@ -16,8 +16,9 @@ class SQLDriver:
     this function also creates a dictionary from the database cluster config file
     '''
     def __init__(self, caller_file, clustercfg):
-        self.caller_file = caller_file 
-        self.cfg_dict = self.get_cfg_dict(clustercfg)
+        self.caller_file = caller_file
+        if clustercfg is not None:
+            self.cfg_dict = self.get_cfg_dict(clustercfg)
 
     def create_catalog(self, dbname):
         sqlConn = sqlite3.connect(dbname)
@@ -120,9 +121,11 @@ class SQLDriver:
             sqlConn = sqlite3.connect(dbname)
             c = sqlConn.cursor()
             c.execute(sql)
-            print(str(c.fetchall()))
+            result = str(c.fetchall())
             sqlConn.commit()
             sqlConn.close()
+            print(result)
+            return result
         except sqlite3.IntegrityError as e:
             print(e)
         except sqlite3.OperationalError as e:
