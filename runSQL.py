@@ -1,4 +1,4 @@
-# runDDL.py
+# runSQL.py
 import configparser
 import multiprocessing
 import pickle
