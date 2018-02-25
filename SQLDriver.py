@@ -115,7 +115,7 @@ class SQLDriver:
 
 
     def run_sql(self, sql, dbname):
-        print('runDDL.py: executing sql statement ' + sql) 
+        print(self.caller_file + ' executing sql statement ' + sql) 
         try:
             sqlConn = sqlite3.connect(dbname)
             c = sqlConn.cursor()
@@ -130,7 +130,7 @@ class SQLDriver:
 
 
     def send_node_sql(self, node_sql, dbhost, dbport, node_num, cat_db, node_db):
-        print('runDDL.py: connecting to host ' + dbhost)
+        print(self.caller_file + ' connecting to host ' + dbhost)
 
         my_socket = socket.socket()
         try:
@@ -139,12 +139,12 @@ class SQLDriver:
             req_to_pickle.append(node_db)
             req_to_pickle.append(node_sql)
             data_string = pickle.dumps(req_to_pickle)
-            print('runDDL.py: send pickled data_array "' + '[%s]' % ', '.join(map(str, req_to_pickle)) + '"')   
+            print(self.caller_file + ' send pickled data_array "' + '[%s]' % ', '.join(map(str, req_to_pickle)) + '"')   
             # my_socket.send(packet.encode())
             my_socket.send(data_string)
 
             data = str(my_socket.recv(1024).decode())
-            print('runDDL.py: recv ' + data + ' from host ' + dbhost)
+            print(self.caller_file + ' recv ' + data + ' from host ' + dbhost)
 
             if(data == 'success'):
                 tname = self.get_table_name(node_sql)
@@ -155,10 +155,10 @@ class SQLDriver:
                     # cat_sql = 'TRUNCATE TABLE tablename;'
                     cat_sql = 'INSERT INTO dtables VALUES ("'+ tname +'","","' + dbhost + '","","",0,' + str(node_num) + ',NULL,NULL,NULL)'
                 self.run_sql(cat_sql, cat_db)
-                # print('runDDL.py: ' + cat_sql)
+                # print(self.caller_file + ' ' + cat_sql)
                 # print('')
         except OSError:
-            print('runDDL.py: failed to connect to host ' + dbhost)
+            print(self.caller_file + ' failed to connect to host ' + dbhost)
         my_socket.close()
 
 
