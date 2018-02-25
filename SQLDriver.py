@@ -101,7 +101,7 @@ class SQLDriver:
         return tname
 
 
-    def multiprocess_node_sql(self, node_sql, cat_db_name):   
+    def multiprocess_node_sql(self, node_sql, cat_db):   
         # create a pool of resources, allocating one resource for each node
         pool = multiprocessing.Pool(int(self.cfg_dict['numnodes']))
         node_sql_response = []
@@ -109,7 +109,7 @@ class SQLDriver:
             db_host = self.cfg_dict['node' + str(current_node_num) + '.hostname']
             db_port = int(self.cfg_dict['node' + str(current_node_num) + '.port'])
             node_db = self.cfg_dict['node' + str(current_node_num) + '.db']
-            node_sql_response.append(pool.apply_async(self.send_node_sql, (node_sql, db_host, db_port, current_node_num, cat_db_name, node_db, )))
+            node_sql_response.append(pool.apply_async(self.send_node_sql, (node_sql, db_host, db_port, current_node_num, cat_db, node_db, )))
         for current_node_num in range(1, int(self.cfg_dict['numnodes']) + 1):
             node_sql_response.pop(0).get()
 
@@ -129,7 +129,7 @@ class SQLDriver:
             print(e)
 
 
-    def send_node_sql(self, ddlSQL, dbhost, dbport, nodeNum, catDbName, nodeDbName):
+    def send_node_sql(self, node_sql, dbhost, dbport, node_num, cat_db, nodeDbName):
         print('runDDL.py: connecting to host ' + dbhost)
 
         mySocket = socket.socket()
@@ -137,9 +137,9 @@ class SQLDriver:
             mySocket.connect((dbhost, dbport))
             listToBePickled = []
             listToBePickled.append(nodeDbName)
-            listToBePickled.append(ddlSQL)
+            listToBePickled.append(node_sql)
             data_string = pickle.dumps(listToBePickled)
-            # packet = '<dbname>' + nodeDbName + '</dbname>' + ddlSQL
+            # packet = '<dbname>' + nodeDbName + '</dbname>' + node_sql
             # print('runDDL.py: send data "' + packet + '"')
             print('runDDL.py: send pickled data_array "' + '[%s]' % ', '.join(map(str, listToBePickled)) + '"')   
             # mySocket.send(packet.encode())
@@ -149,14 +149,14 @@ class SQLDriver:
             print('runDDL.py: recv ' + data + ' from host ' + dbhost)
 
             if(data == 'success'):
-                tname = self.get_table_name(ddlSQL)
+                tname = self.get_table_name(node_sql)
                 # print('tname is ' + tname)
-                catSQL = 'DELETE FROM dtables WHERE nodeid='+ str(nodeNum) + ';'            
-                if self.table_is_created(ddlSQL):
-                    # print ('ddlSQL is a create statement')
+                catSQL = 'DELETE FROM dtables WHERE nodeid='+ str(node_num) + ';'            
+                if self.table_is_created(node_sql):
+                    # print ('node_sql is a create statement')
                     # catSQL = 'TRUNCATE TABLE tablename;'
-                    catSQL = 'INSERT INTO dtables VALUES ("'+ tname +'","","' + dbhost + '","","",0,' + str(nodeNum) + ',NULL,NULL,NULL)'
-                self.run_sql(catSQL, catDbName)
+                    catSQL = 'INSERT INTO dtables VALUES ("'+ tname +'","","' + dbhost + '","","",0,' + str(node_num) + ',NULL,NULL,NULL)'
+                self.run_sql(catSQL, cat_db)
                 # print('runDDL.py: ' + catSQL)
                 # print('')
         except OSError:
