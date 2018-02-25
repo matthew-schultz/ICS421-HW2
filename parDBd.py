@@ -56,7 +56,7 @@ def Main():
         runDDLConn.close()
         mySocket.close()
     else:
-        print("parDBd: ERROR need at least 3 arguments to run properly (e.g. \"python3 parDBd.py 171.0.0.2 5000\"")
+        print("parDBd: ERROR need at least 3 arguments to run properly (e.g. \"python3 parDBd.py 172.17.0.2 5000\"")
 
 
 if __name__ == '__main__':
