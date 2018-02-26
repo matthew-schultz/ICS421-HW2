@@ -31,10 +31,22 @@ def main():
             csvfile = sys.argv[2]
             sql_driver = SQLDriver.SQLDriver(__file__, clustercfg)
 
-            response = sql_driver.load_csv('','', csvfile)
-            print(__file__ + ": load_csv() response is " + str(response))
+            # response = sql_driver.load_csv('','', csvfile)
+            # print(__file__ + ": load_csv() response is " + str(response))            
+
+            # def load_csv(self, db, table, csv):
+            response_list = []
+            tuples = sql_driver.get_tuples_from_csv(csvfile)
+
+            for current_node_num in range(1, int(sql_driver.cfg_dict['numnodes']) + 1):
+                partmtd = sql_driver.get_partmtd(current_node_num)
+                print('partmtd is: ',partmtd)
+                print('current_node_num is :', current_node_num)
 
             tests(sql_driver)
+
+            # return response_list
+
 
         except FileNotFoundError as e:
             print(__file__ + ': ' + str(e))

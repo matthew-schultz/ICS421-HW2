@@ -107,15 +107,6 @@ class SQLDriver:
         return tname
 
 
-    def load_csv(self, db, table, csv):
-        response_list = []
-        tuples = self.get_tuples_from_csv(csv)
-
-        for current_node_num in range(1, int(self.cfg_dict['numnodes']) + 1):
-            partmtd = self.get_partmtd(current_node_num)
-            print('partmtd is: ',partmtd)
-
-        return response_list
 
     def get_node_dict_from_catalog(self, nodenum):
         node_dict = []        
