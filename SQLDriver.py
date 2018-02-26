@@ -116,22 +116,35 @@ class SQLDriver:
 
 
     def run_sql(self, sql, dbname):
-        print(self.caller_file + ' executing sql statement ' + sql) 
+        print(self.caller_file + ': executing sql statement ' + sql) 
         try:
             sqlConn = sqlite3.connect(dbname)
             c = sqlConn.cursor()
-            c.execute(sql)
-            result = str(c.fetchall())
+#            c.execute(sql)
+            result = ''
+            for row in c.execute(sql):
+                print(str(row))
+                result += str(row) + '\n'
+#            result = str(c.fetchall())
             sqlConn.commit()
             sqlConn.close()
-            # print(result)
+            # create sql_result to store if sql was success and rows
+            sql_result = []
+            sql_result.append('success')
+            sql_result.append(result)
             return result
         except sqlite3.IntegrityError as e:
             print(e)
-            return 'failure'
+            sql_result = []
+            sql_result.append('failure')
+            sql_result.append('')
+            return sql_result
         except sqlite3.OperationalError as e:
             print(e)
-            return 'failure'
+            sql_result = []
+            sql_result.append('failure')
+            sql_result.append('')
+            return sql_result
 
     def send_node_sql(self, node_sql, dbhost, dbport, node_num, cat_db, node_db):
         print(self.caller_file + ' connecting to host ' + dbhost)
@@ -148,12 +161,21 @@ class SQLDriver:
             my_socket.send(data_string)
 
             data = str(my_socket.recv(1024).decode())
-            print(self.caller_file + ' recv ' + data + ' from host ' + dbhost)
+
+            # return from Main() if no data was received
+            if not data:
+                return
+            data_arr = pickle.loads(data)
+            print(caller_file + ': Received' + repr(data_arr))
+
+            dbfilename = data_arr[0]
+
+            print(self.caller_file + ' recv ' + data_arr[0] + ' from host ' + dbhost)
+            print(self.caller_file + ' recv ' + data_arr[1] + ' from host ' + dbhost)
 
             # get response list from parDBd
-            
 
-            if(data == 'success'):
+            if(data_arr[0] == 'success'):
                 tname = self.get_table_name(node_sql)
                 # print('tname is ' + tname)
                 cat_sql = 'DELETE FROM dtables WHERE nodeid='+ str(node_num) + ';'            

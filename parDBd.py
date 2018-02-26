@@ -52,10 +52,14 @@ def Main():
         sql_response = sql_driver.run_sql(ddlSQL, dbfilename)
 
         # response = ''#CreateTable(dbfilename, ddlSQL)
-        print('parDBd: response is ' + sql_response)
+        # if(sql_response[0] != 'failure'):
+            
+        print('parDBd: sql statement ' + sql_response[0])
+        print('parDBd: send response "' + str(sql_response) +  '" for sql "' + str(ddlSQL) + '"')
 
-        print ('parDBd: send response "' + str(sql_response) +  '" for sql "' + str(ddlSQL) + '"')
-        runDDLConn.send(sql_response.encode())
+        data_string = pickle.dumps(sql_response) 
+
+        runDDLConn.send(data_string.encode())
 
         runDDLConn.close()
         mySocket.close()
