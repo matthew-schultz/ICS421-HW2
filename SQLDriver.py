@@ -20,7 +20,7 @@ class SQLDriver:
         self.caller_file = caller_file
         if clustercfg is not None:
             self.cfg_dict = self.get_cfg_dict(clustercfg)
-            #print(caller_file + ': cfg_dict is: ' + str(self.cfg_dict) )
+            print(caller_file + ': cfg_dict is: ' + str(self.cfg_dict) )
             print('dict fields :')
             for x in self.cfg_dict:
                 print(x,':',self.cfg_dict[x])

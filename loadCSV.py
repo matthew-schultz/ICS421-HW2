@@ -27,7 +27,6 @@ def test_run(sql_driver):
     print('value is: ' + value[1])
 
 def tests(sql_driver):
-    print('vulgarity')
     test_create_books(sql_driver)
 #    test_insert_dtables(sql_driver):
 #    test_run(sql_driver)
@@ -80,6 +79,8 @@ def main():
 
         except FileNotFoundError as e:
             print(__file__ + ': ' + str(e))
+        except KeyError as e:
+            print(__file__ + ': Your config file may be missing a value like tablename' + str(e))
     else:
         print(__file__ + ': ERROR need at least 2 arguments to run properly (e.g. \"python3 loadCSV.py cluster.cfg books.csv\"')
 
