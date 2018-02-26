@@ -8,7 +8,14 @@ def test_insert_dtables(sql_driver):
     with open(insert_dtables, 'r') as myfile:
         data=myfile.read().replace('\n', '')
         # print(__file__ + ': data is ' + data)
-        sql_driver.run_sql(data, 'mycatdb.db')
+        sql_driver.run_sql(data, sql_driver.cfg_dict['tablename'] + '.db')
+
+def test_create_books(sql_driver):
+    sql = 'create_books.sql'
+    with open(sql, 'r') as myfile:
+        data=myfile.read().replace('\n', '')
+        # print(__file__ + ': data is ' + data)
+        sql_driver.run_sql(data, sql_driver.cfg_dict['tablename'] + '.db')
 
 def test_run(sql_driver):
     dbname = 'mycatdb.db'
@@ -19,9 +26,18 @@ def test_run(sql_driver):
     value = sql_driver.select_value_from_db(dbname, valuename, tablename, where_col, where_val);
     print('value is: ' + value[1])
 
-# def tests(sql_driver):
+def tests(sql_driver):
+    print('vulgarity')
+    test_create_books(sql_driver)
 #    test_insert_dtables(sql_driver):
 #    test_run(sql_driver)
+
+def trim_partmtd(partmtd):
+    if(partmtd.startswith('(') ):
+        partmtd = partmtd.split('(')[1]
+    if(partmtd.endswith(',)\n') ):
+        partmtd= partmtd.split(',)')[0]
+    return partmtd
 
 def main():
     if(len(sys.argv) >= 3):
@@ -40,18 +56,24 @@ def main():
 
             for current_node_num in range(1, int(sql_driver.cfg_dict['numnodes']) + 1):
                 partmtd = sql_driver.get_partmtd(current_node_num)
-                print('partmtd is: ',partmtd)
+                partmtd = trim_partmtd(partmtd)
+
                 # print('current_node_num is :', current_node_num)
-                if(partmtd == 0):
+                if(partmtd == '0'):
                     print('send to every node')
-                elif(partmtd == 1):
+                    print('tuples are ' + str(tuples))
+                    sql_driver.partition_all(tuples)
+                elif(partmtd == '1'):
                     print('send if value fits in node range')
-                elif(partmtd == 2):
+                    print('tuples are ' + str(tuples))
+                    sql_driver.partition_range(tuples)
+                elif(partmtd == '2'):
                     print('mod value and send if mod matches node num')
+                    sql_driver.partition_hash(tuples)
                 else:
                     print(__file__ + 'node ' + str(current_node_num) + ' returned an invalid partmtd value')
 
-            # tests(sql_driver)
+            tests(sql_driver)
 
             # return response_list
 

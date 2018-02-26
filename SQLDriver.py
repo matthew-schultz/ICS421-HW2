@@ -21,9 +21,9 @@ class SQLDriver:
         if clustercfg is not None:
             self.cfg_dict = self.get_cfg_dict(clustercfg)
             #print(caller_file + ': cfg_dict is: ' + str(self.cfg_dict) )
-            #print('dict fields :')
-            #for x in self.cfg_dict:
-            #    print(x,':',self.cfg_dict[x])
+            print('dict fields :')
+            for x in self.cfg_dict:
+                print(x,':',self.cfg_dict[x])
 
     def create_catalog(self, dbname):
         sqlConn = sqlite3.connect(dbname)
@@ -106,7 +106,9 @@ class SQLDriver:
         tname = tname.split('(')[0] #remove trailing '('
         return tname
 
-
+    def update_catalog(nodeid, partcol, partparam1, partparam2, partmtd):
+        print('')
+        
 
     def get_node_dict_from_catalog(self, nodenum):
         node_dict = []        
@@ -142,7 +144,7 @@ class SQLDriver:
     def get_tuples_from_csv(self, csv_filename):
         tuples = []
         with open(csv_filename, newline='') as csvfile:
-            reader = csv.reader(csvfile, delimiter=',')
+            reader = csv.reader(csvfile, delimiter='\n')
             for row in reader:
                 tuples.append(row)
         return tuples
@@ -151,6 +153,19 @@ class SQLDriver:
         if(cfg_dict['numnodes'] != cfg_dict[]):
             print('')
 '''            # throw error
+
+    def partition_all(self, tuples):
+        for sql_tuple in tuples:
+            insert = self.insert_tuple(self.cfg_dict['tablename'], sql_tuple)
+            print('insert is ',insert)
+
+    def insert_tuple(self, tablename, sql_tuple):            
+        # values_string = ''
+        # print('tup is' + sql_tuple[0])
+        insert_sql = 'INSERT into ' + tablename + ' VALUES(' + sql_tuple[0] + ');'
+        self.run_sql(insert_sql, tablename + '.db')
+        return insert_sql
+
 
 
     def multiprocess_node_sql(self, node_sql, cat_db):   
