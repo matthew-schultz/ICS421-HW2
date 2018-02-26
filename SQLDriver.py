@@ -20,10 +20,10 @@ class SQLDriver:
         self.caller_file = caller_file
         if clustercfg is not None:
             self.cfg_dict = self.get_cfg_dict(clustercfg)
-            print(caller_file + ': cfg_dict is: ' + str(self.cfg_dict) )
-            print('dict fields :')
-            for x in self.cfg_dict:
-                print(x,':',self.cfg_dict[x])
+            # print(caller_file + ': cfg_dict is: ' + str(self.cfg_dict) )
+            # print('dict fields :')
+            # for x in self.cfg_dict:
+            #    print(x,':',self.cfg_dict[x])
 
     def create_catalog(self, dbname):
         sqlConn = sqlite3.connect(dbname)
@@ -156,14 +156,17 @@ class SQLDriver:
 
     def partition_all(self, tuples):
         for sql_tuple in tuples:
-            insert = self.insert_tuple(self.cfg_dict['tablename'], sql_tuple)
-            print('insert is ',insert)
+            # insert = self.insert_tuple(self.cfg_dict['tablename'], sql_tuple)
+            insert_sql = 'INSERT into ' + self.cfg_dict['tablename'] + ' VALUES(' + sql_tuple[0] + ');'
+            print('insert is ',insert_sql)
+            # print('idx is ' + str(idx))
+            
 
     def insert_tuple(self, tablename, sql_tuple):            
         # values_string = ''
         # print('tup is' + sql_tuple[0])
         insert_sql = 'INSERT into ' + tablename + ' VALUES(' + sql_tuple[0] + ');'
-        self.run_sql(insert_sql, tablename + '.db')
+        # self.run_sql(insert_sql, tablename + '.db')
         return insert_sql
 
 
