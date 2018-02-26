@@ -1,5 +1,6 @@
 # runSQL.py
 # import configparser
+import csv
 import multiprocessing
 import pickle
 import socket
@@ -19,6 +20,7 @@ class SQLDriver:
         self.caller_file = caller_file
         if clustercfg is not None:
             self.cfg_dict = self.get_cfg_dict(clustercfg)
+            print(caller_file + ': cfg_dict is: ' + str(self.cfg_dict) )
 
     def create_catalog(self, dbname):
         sqlConn = sqlite3.connect(dbname)
@@ -100,6 +102,27 @@ class SQLDriver:
             count = count + 1   
         tname = tname.split('(')[0] #remove trailing '('
         return tname
+
+
+    def load_csv(self, db, table, csv):
+        response_list = []
+        tuples = self.get_tuples_from_csv(csv)
+        # print('tuples are ' + str(tuples))
+        compare_num_nodes_partitions()
+        return response_list
+
+    def get_tuples_from_csv(self, csv_filename):
+        tuples = []
+        with open(csv_filename, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            for row in reader:
+                tuples.append(row)
+        return tuples
+
+    def compare_num_nodes_partitions(self):
+        if(cfg_dict['numnodes'] != cfg_dict[]):
+            print('')
+            # throw error
 
 
     def multiprocess_node_sql(self, node_sql, cat_db):   
