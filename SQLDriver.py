@@ -161,7 +161,8 @@ class SQLDriver:
             # my_socket.send(packet.encode())
             my_socket.send(data_string)
 
-            data_arr = str(my_socket.recv(1024))
+            data = my_socket.recv(1024)
+            data_arr = pickle.loads(data)
 
             # return from Main() if no data was received
             if not data_arr:
