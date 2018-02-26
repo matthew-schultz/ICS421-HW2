@@ -21,6 +21,9 @@ class SQLDriver:
         if clustercfg is not None:
             self.cfg_dict = self.get_cfg_dict(clustercfg)
             print(caller_file + ': cfg_dict is: ' + str(self.cfg_dict) )
+            print('dict fields :')
+            for x in self.cfg_dict:
+                print(x,':',self.cfg_dict[x])
 
     def create_catalog(self, dbname):
         sqlConn = sqlite3.connect(dbname)
@@ -107,9 +110,42 @@ class SQLDriver:
     def load_csv(self, db, table, csv):
         response_list = []
         tuples = self.get_tuples_from_csv(csv)
-        # print('tuples are ' + str(tuples))
-        compare_num_nodes_partitions()
+
+        for current_node_num in range(1, int(self.cfg_dict['numnodes']) + 1):
+            partmtd = self.get_partmtd(current_node_num)
+            print('partmtd is: ',partmtd)
+
         return response_list
+
+    def get_node_dict_from_catalog(self, nodenum):
+        node_dict = []        
+        # partmtd_sql = 'SELECT partmtd from dtables WHERE nodeid=' + nodenum + ';'
+        # partmtd = select_value_from_db(self, dbname, tablename, valuename, where_col, where_val)
+        # node_dict.append(partmtd)
+
+        return []
+
+    '''
+    Need to include '' in where_val arg string if that db column is of string type
+    Arguments are in sql order "SELECT valuename FROM tablename WHERE where_col = where_val;"
+    '''
+    def select_value_from_db(self, dbname, valuename, tablename, where_col, where_val):
+        value = ''
+        select_sql = 'SELECT ' + valuename + ' FROM ' + tablename + ' WHERE ' \
+        + where_col + '= ' + str(where_val) + ';'
+
+        sql_result = self.run_sql(select_sql, dbname)
+        if(sql_result[0] == 'success'):
+            value = sql_result[1]
+        return value
+
+    def get_partmtd(self, nodenum):
+        dbname = self.cfg_dict['catalog.db'] #MAGIC VALUE FOR NOW; CAN THIS BE CHANGED/IS THIS ROBUST?         
+        tablename = 'dtables'
+        valuename = 'partmtd'
+        where_col = 'nodeid'
+        partmtd = self.select_value_from_db(dbname, valuename, tablename, where_col, nodenum)
+        return partmtd
 
     def get_tuples_from_csv(self, csv_filename):
         tuples = []
@@ -119,10 +155,10 @@ class SQLDriver:
                 tuples.append(row)
         return tuples
 
-    def compare_num_nodes_partitions(self):
+    '''def compare_num_nodes_partitions(self):
         if(cfg_dict['numnodes'] != cfg_dict[]):
             print('')
-            # throw error
+'''            # throw error
 
 
     def multiprocess_node_sql(self, node_sql, cat_db):   
