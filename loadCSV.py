@@ -19,9 +19,9 @@ def test_run(sql_driver):
     value = sql_driver.select_value_from_db(dbname, valuename, tablename, where_col, where_val);
     print('value is: ' + value[1])
 
-def tests(sql_driver):
+# def tests(sql_driver):
 #    test_insert_dtables(sql_driver):
-    test_run(sql_driver)
+#    test_run(sql_driver)
 
 def main():
     if(len(sys.argv) >= 3):
@@ -41,9 +41,17 @@ def main():
             for current_node_num in range(1, int(sql_driver.cfg_dict['numnodes']) + 1):
                 partmtd = sql_driver.get_partmtd(current_node_num)
                 print('partmtd is: ',partmtd)
-                print('current_node_num is :', current_node_num)
+                # print('current_node_num is :', current_node_num)
+                if(partmtd == 0):
+                    print('send to every node')
+                elif(partmtd == 1):
+                    print('send if value fits in node range')
+                elif(partmtd == 2):
+                    print('mod value and send if mod matches node num')
+                else:
+                    print(__file__ + 'node ' + str(current_node_num) + ' returned an invalid partmtd value')
 
-            tests(sql_driver)
+            # tests(sql_driver)
 
             # return response_list
 

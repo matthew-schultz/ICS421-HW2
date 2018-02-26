@@ -20,10 +20,10 @@ class SQLDriver:
         self.caller_file = caller_file
         if clustercfg is not None:
             self.cfg_dict = self.get_cfg_dict(clustercfg)
-            print(caller_file + ': cfg_dict is: ' + str(self.cfg_dict) )
-            print('dict fields :')
-            for x in self.cfg_dict:
-                print(x,':',self.cfg_dict[x])
+            #print(caller_file + ': cfg_dict is: ' + str(self.cfg_dict) )
+            #print('dict fields :')
+            #for x in self.cfg_dict:
+            #    print(x,':',self.cfg_dict[x])
 
     def create_catalog(self, dbname):
         sqlConn = sqlite3.connect(dbname)
@@ -128,6 +128,7 @@ class SQLDriver:
         sql_result = self.run_sql(select_sql, dbname)
         if(sql_result[0] == 'success'):
             value = sql_result[1]
+        print('select was ', value)
         return value
 
     def get_partmtd(self, nodenum):
@@ -173,7 +174,7 @@ class SQLDriver:
 #            c.execute(sql)
             result = ''
             for row in c.execute(sql):
-                print(str(row))
+                print('str is ' + str(row))
                 result += str(row) + '\n'
 #            result = str(c.fetchall())
             sqlConn.commit()
