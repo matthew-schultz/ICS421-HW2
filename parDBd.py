@@ -57,10 +57,9 @@ def Main():
         print('parDBd: sql statement ' + sql_response[0])
         print('parDBd: send response "' + str(sql_response) +  '" for sql "' + str(ddlSQL) + '"')
 
-        data_string = pickle.dumps(sql_response) 
+        data_string = pickle.dumps(sql_response)
 
-        runDDLConn.send(data_string.encode())
-
+        runDDLConn.send(data_string)
         runDDLConn.close()
         mySocket.close()
     else:

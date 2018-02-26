@@ -132,7 +132,8 @@ class SQLDriver:
             sql_result = []
             sql_result.append('success')
             sql_result.append(result)
-            return result
+            # print(self.caller_file + ': returning results of sql statement ' + sql) 
+            return sql_result
         except sqlite3.IntegrityError as e:
             print(e)
             sql_result = []
@@ -160,13 +161,13 @@ class SQLDriver:
             # my_socket.send(packet.encode())
             my_socket.send(data_string)
 
-            data = str(my_socket.recv(1024).decode())
+            data_arr = str(my_socket.recv(1024))
 
             # return from Main() if no data was received
-            if not data:
+            if not data_arr:
                 return
-            data_arr = pickle.loads(data)
-            print(caller_file + ': Received' + repr(data_arr))
+            # data_arr = pickle.loads(data)
+            print(self.caller_file + ': Received' + repr(data_arr))
 
             dbfilename = data_arr[0]
 
