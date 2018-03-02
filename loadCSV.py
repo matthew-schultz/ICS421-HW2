@@ -42,6 +42,7 @@ def main():
     if(len(sys.argv) >= 3):
         try:
             print('executing loadCSV')
+            print('load it up')
             clustercfg = sys.argv[1]
             csvfile = sys.argv[2]
             sql_driver = SQLDriver.SQLDriver(__file__, clustercfg)
