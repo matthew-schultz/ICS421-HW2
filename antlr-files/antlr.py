@@ -15,13 +15,13 @@ def getTableName(input):
 #    SQLite = PrintSQLiteListener()
     SQLite = GetTableSQLiteListener()
     walker = ParseTreeWalker()
-    tablename = walker.walk(SQLite, tree) 
-    return tableName
+    walker.walk(SQLite, tree)
+    return SQLite.tablename
 
 def main(argv):
     input = FileStream(argv[1])
     tablename = getTableName(input)
-    print(SQLite.tablename)   
+    print(tablename)   
 #    output.close()      
 
 def test(argv):
