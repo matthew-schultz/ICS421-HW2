@@ -1,7 +1,8 @@
 import sys
 from antlr4 import *
 from SQLiteLexer import SQLiteLexer
-from PrintSQLiteListener import PrintSQLiteListener
+# from PrintSQLiteListener import PrintSQLiteListener
+from GetTableSQLiteListener import GetTableSQLiteListener
 from SQLiteParser import SQLiteParser
  
 def getTableName(sqlString):
@@ -16,9 +17,11 @@ def main(argv):
     tree = parser.sql_stmt()
 #    output = open("sqlOutput.txt","w")
     
-    SQLite = PrintSQLiteListener()
+#    SQLite = PrintSQLiteListener()
+    SQLite = GetTableSQLiteListener()
     walker = ParseTreeWalker()
-    walker.walk(SQLite, tree)    
+    tablename = walker.walk(SQLite, tree) 
+    print(SQLite.tablename)   
 #    output.close()      
 
 def test(argv):
