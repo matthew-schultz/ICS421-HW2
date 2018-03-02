@@ -5,12 +5,7 @@ from SQLiteLexer import SQLiteLexer
 from GetTableSQLiteListener import GetTableSQLiteListener
 from SQLiteParser import SQLiteParser
  
-def getTableName(sqlString):
-    tableName = ""
-    return tableName
-
-def main(argv):
-    input = FileStream(argv[1])
+def getTableName(input):
     lexer = SQLiteLexer(input)
     stream = CommonTokenStream(lexer)
     parser = SQLiteParser(stream)
@@ -21,6 +16,11 @@ def main(argv):
     SQLite = GetTableSQLiteListener()
     walker = ParseTreeWalker()
     tablename = walker.walk(SQLite, tree) 
+    return tableName
+
+def main(argv):
+    input = FileStream(argv[1])
+    tablename = getTableName(input)
     print(SQLite.tablename)   
 #    output.close()      
 
