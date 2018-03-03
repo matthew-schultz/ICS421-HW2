@@ -5,7 +5,7 @@ from SQLiteLexer import SQLiteLexer
 from GetTableSQLiteListener import GetTableSQLiteListener
 from SQLiteParser import SQLiteParser
  
-def getTableName(input):
+def get_table_name(input):
     lexer = SQLiteLexer(input)
     stream = CommonTokenStream(lexer)
     parser = SQLiteParser(stream)
@@ -20,7 +20,7 @@ def getTableName(input):
 
 def main(argv):
     input = FileStream(argv[1])
-    tablename = getTableName(input)
+    tablename = get_table_name(input)
     print(tablename)   
 #    output.close()      
 

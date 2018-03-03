@@ -1,7 +1,26 @@
 #loadCSV.py
 
-import sys
+# import sys
+import os, sys, inspect
 import SQLDriver
+from GetTablename import GetTablename
+
+# https://stackoverflow.com/questions/279237/import-a-module-from-a-relative-path
+# realpath() will make your script run, even if you symlink it :)
+cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))
+if cmd_folder not in sys.path:
+    sys.path.insert(0, cmd_folder)
+
+# Use this if you want to include modules from a subfolder
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"antlr-files")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
+
+# Use this if you want to include modules from a subfolder
+cmd_subfolder = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile( inspect.currentframe() ))[0],"sql-files")))
+if cmd_subfolder not in sys.path:
+    sys.path.insert(0, cmd_subfolder)
+
 
 def test_insert_dtables(sql_driver):
     insert_dtables = 'insert_dtables.sql'
@@ -26,10 +45,17 @@ def test_run(sql_driver):
     value = sql_driver.select_value_from_db(dbname, valuename, tablename, where_col, where_val);
     print('value is: ' + value[1])
 
+def test_get_tablename(sql_filename):
+    g = GetTablename()
+    tablename = g.get_tablename(sql_filename)
+    print('tablename test result is ', tablename)
+
 def tests(sql_driver):
-    test_create_books(sql_driver)
+    test_get_tablename('books.sql')
+#    test_create_books(sql_driver)
 #    test_insert_dtables(sql_driver):
 #    test_run(sql_driver)
+
 
 def trim_partmtd(partmtd):
     if(partmtd.startswith('(') ):

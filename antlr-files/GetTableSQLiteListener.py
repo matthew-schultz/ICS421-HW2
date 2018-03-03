@@ -11,4 +11,4 @@ class GetTableSQLiteListener(SQLiteListener) :
 
     # Exit a parse tree produced by SQLiteParser#table_name.
     def exitTable_name(self, ctx:SQLiteParser.Table_nameContext):
-        print("exit")
+        print("exitTable_name")
