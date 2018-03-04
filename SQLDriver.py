@@ -43,9 +43,9 @@ class SQLDriver:
         if clustercfg is not None:
             self.cfg_dict = self.get_cfg_dict(clustercfg)
             # print(caller_file + ': cfg_dict is: ' + str(self.cfg_dict) )
-            print('dict fields :')
-            for x in self.cfg_dict:
-                print(x,':',self.cfg_dict[x])
+            #print('dict fields :')
+            #for x in self.cfg_dict:
+            #    print(x,':',self.cfg_dict[x])
 
     def create_catalog(self, dbname):
         sqlConn = sqlite3.connect(dbname)
@@ -133,7 +133,7 @@ class SQLDriver:
                 statement_to_run = self.build_catalog_update_statement(current_node_num)
              #else:
              #   statement_to_run = self.build_catalog_insert_statement(current_node_num)
-            print('statement_to_run is ', statement_to_run)        
+            #print('statement_to_run is ', statement_to_run)        
             dbname = self.cfg_dict['catalog.db']
             self.run_sql(statement_to_run, dbname)
 
@@ -162,7 +162,7 @@ class SQLDriver:
         #remove trailing comma that breaks sql query
         if ', where' in statement:
             statement = statement.replace(', where', ' where')
-        print(',where removed is ', statement)
+        # print(',where removed is ', statement)
         return statement                            
 
     def build_catalog_insert_statement(self, node_num):
