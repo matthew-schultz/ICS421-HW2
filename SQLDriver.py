@@ -236,7 +236,7 @@ class SQLDriver:
             return sql_result
 
     def send_node_sql(self, node_sql, dbhost, dbport, node_num, cat_db, node_db):
-        print(self.caller_file + ' connecting to host ' + dbhost)
+        print(self.caller_file + ': connecting to host ' + dbhost)
 
         my_socket = socket.socket()
         try:
@@ -245,7 +245,7 @@ class SQLDriver:
             req_to_pickle.append(node_db)
             req_to_pickle.append(node_sql)
             data_string = pickle.dumps(req_to_pickle)
-            print(self.caller_file + ' send pickled data_array "' + '[%s]' % ', '.join(map(str, req_to_pickle)) + '"')   
+            print(self.caller_file + ': send pickled data_array "' + '[%s]' % ', '.join(map(str, req_to_pickle)) + '"')   
             # my_socket.send(packet.encode())
             my_socket.send(data_string)
 
@@ -256,24 +256,24 @@ class SQLDriver:
             if not data_arr:
                 return
             # data_arr = pickle.loads(data)
-            print(self.caller_file + ': Received' + repr(data_arr))
+            # print(self.caller_file + ': recv array ' + repr(data_arr))
 
             dbfilename = data_arr[0]
 
-            print(self.caller_file + ' recv ' + data_arr[0] + ' from host ' + dbhost)
-            print(self.caller_file + ' recv ' + data_arr[1] + ' from host ' + dbhost)
+            print(self.caller_file + ': recv msg ' + data_arr[0] + ' from host ' + dbhost)
+            print(self.caller_file + ': recv sql rows' + data_arr[1] + ' from host ' + dbhost)
 
             # get response list from parDBd
 
-            if(data_arr[0] == 'success'):
-                tname = self.get_table_name(node_sql)
+#            if(data_arr[0] == 'success'):
+#                tname = self.get_table_name(node_sql)
                 # print('tname is ' + tname)
-                cat_sql = 'DELETE FROM dtables WHERE nodeid='+ str(node_num) + ';'            
-                if self.table_is_created(node_sql):
+#                cat_sql = 'DELETE FROM dtables WHERE nodeid='+ str(node_num) + ';'            
+#                if self.table_is_created(node_sql):
                     # print ('node_sql is a create statement')
                     # cat_sql = 'TRUNCATE TABLE tablename;'
-                    cat_sql = 'INSERT INTO dtables VALUES ("'+ tname +'","","' + dbhost + '","","",0,' + str(node_num) + ',NULL,NULL,NULL)'
-                self.run_sql(cat_sql, cat_db)
+#                    cat_sql = 'INSERT INTO dtables VALUES ("'+ tname +'","","' + dbhost + '","","",0,' + str(node_num) + ',NULL,NULL,NULL)'
+#                self.run_sql(cat_sql, cat_db)
                 # print(self.caller_file + ' ' + cat_sql)
                 # print('')
         except OSError:
