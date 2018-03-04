@@ -20,8 +20,6 @@ def main():
             node_sql = myfile.read().replace('\n', '')
 
         cat_db_name = sql_driver.get_cat_db()
-        cat_msg = sql_driver.create_catalog(cat_db_name)
-        print(__file__ + ': create_catalog() returned "' + cat_msg + '"')
 
         sql_driver.multiprocess_node_sql(node_sql, cat_db_name)
     else:
