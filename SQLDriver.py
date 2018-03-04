@@ -40,9 +40,9 @@ class SQLDriver:
         if clustercfg is not None:
             self.cfg_dict = self.get_cfg_dict(clustercfg)
             # print(caller_file + ': cfg_dict is: ' + str(self.cfg_dict) )
-            # print('dict fields :')
-            # for x in self.cfg_dict:
-            #    print(x,':',self.cfg_dict[x])
+            print('dict fields :')
+            for x in self.cfg_dict:
+                print(x,':',self.cfg_dict[x])
 
     def create_catalog(self, dbname):
         sqlConn = sqlite3.connect(dbname)
@@ -125,9 +125,47 @@ class SQLDriver:
         tname = tname.split('(')[0] #remove trailing '('
         return tname
 
-    def update_catalog(nodeid, partcol, partparam1, partparam2, partmtd):
-        print('')
-        
+    def update_catalog(self):
+        numnodes = int(self.cfg_dict['numnodes'] )
+        for current_node_num in range(1, numnodes + 1):    
+#            print('current_node_num in update_catalog is ',current_node_num)
+            statement_to_run = ''
+            if(self.check_catalog_if_node_exists(current_node_num) == '1'):
+                statement_to_run = self.build_catalog_update_statement(current_node_num)
+            else:
+                statement_to_run = self.build_catalog_insert_statement(current_node_num)
+            print('statement_to_run is ', statement_to_run)
+#            dbname = ''
+#            run_sql(statement_to_run, dbname)
+
+    def build_catalog_update_statement(self, current_node_num):
+        statement = 'update dtables set'
+        statement += 'where nodeid=' + current_node_num + ';'
+        return statement                            
+
+    def build_catalog_insert_statement(self, node_num):
+        statement = 'insert dtables'
+        return statement
+
+#return string '1' if row for node exists, return '0' if it does not
+    def check_catalog_if_node_exists(self, nodenum):
+        catalog_statement = 'SELECT EXISTS(SELECT 1 FROM dtables WHERE nodeid='+str(nodenum)+')';
+        catdbname = self.cfg_dict['catalog.db']
+#        print('catdbname is' + catdbname)
+        response_arr = self.run_sql(catalog_statement, catdbname)
+        print('check_catalog_if_node_exists response[1] is', str(response_arr[1]) )
+        # trim responses like '(1,)' to '1'
+        response = self.trim_sql_response(response_arr[1]) 
+        print('check_catalog_if_node_exists trimmed response is', response)
+        return response
+
+#trim sql responses like '(1,)' to '1'
+    def trim_sql_response(self, sql):
+        if(sql.startswith('(') ):
+            sql = sql.split('(')[1]
+        if(sql.endswith(',)\n') ):
+            sql= sql.split(',)')[0]
+        return sql
 
     def get_node_dict_from_catalog(self, nodenum):
         node_dict = []        

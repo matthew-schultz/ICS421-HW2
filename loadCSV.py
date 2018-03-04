@@ -80,8 +80,7 @@ def main():
             csvfile = sys.argv[2]
             sql_driver = SQLDriver.SQLDriver(__file__, clustercfg)
 
-            # response = sql_driver.load_csv('','', csvfile)
-            # print(__file__ + ": load_csv() response is " + str(response))            
+            sql_driver.update_catalog()           
 
             # def load_csv(self, db, table, csv):
             response_list = []
