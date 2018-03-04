@@ -43,9 +43,9 @@ class SQLDriver:
         if clustercfg is not None:
             self.cfg_dict = self.get_cfg_dict(clustercfg)
             # print(caller_file + ': cfg_dict is: ' + str(self.cfg_dict) )
-            #print('dict fields :')
-            #for x in self.cfg_dict:
-            #    print(x,':',self.cfg_dict[x])
+            print('dict fields :')
+            for x in self.cfg_dict:
+                print(x,':',self.cfg_dict[x])
 
     def create_catalog(self, dbname):
         sqlConn = sqlite3.connect(dbname)
@@ -82,7 +82,6 @@ class SQLDriver:
         file = open(clustercfg)
         content = file.read()
         config_array = content.split("\n")
-        # configList = []
         config_dict = {}
         for config in config_array:
             if config:
@@ -106,9 +105,6 @@ class SQLDriver:
                     config_dict[nodename + '.db'] = configDb + '.db'
                     configValue = configIP
                 config_dict[config_key]=configValue
-            '''#configList.append(c)[1]
-                    print (c[0] + '=' + c[1])
-                    config_dict[c[0]] = c[1]'''
         print(self.caller_file +': config file "' + clustercfg + '" read successfully')
         file.close()
         return config_dict
@@ -137,9 +133,9 @@ class SQLDriver:
                 statement_to_run = self.build_catalog_update_statement(current_node_num)
              #else:
              #   statement_to_run = self.build_catalog_insert_statement(current_node_num)
-            print('statement_to_run is ', statement_to_run)
-#            dbname = ''
-#            run_sql(statement_to_run, dbname)
+            print('statement_to_run is ', statement_to_run)        
+            dbname = self.cfg_dict['catalog.db']
+            self.run_sql(statement_to_run, dbname)
 
 # this function takes the int current_node_num, creates variables for each column in dtables,
 # stores the associated cfg_dict key in the variable
@@ -162,10 +158,11 @@ class SQLDriver:
             statement+= 'partparam1' + '=' + self.cfg_dict[partparam2] + ','
         if partparam2 in self.cfg_dict:
             statement+= 'partparam2' + '=' + self.cfg_dict[partparam2] + ','
+        statement += ' where nodeid=' + str(current_node_num) + ';'
         #remove trailing comma that breaks sql query
-        if ',where' in statement:
-            statement = statement.replace(',where', 'where')
-        statement += 'where nodeid=' + str(current_node_num) + ';'
+        if ', where' in statement:
+            statement = statement.replace(', where', ' where')
+        print(',where removed is ', statement)
         return statement                            
 
     def build_catalog_insert_statement(self, node_num):
@@ -178,10 +175,10 @@ class SQLDriver:
         catdbname = self.cfg_dict['catalog.db']
 #        print('catdbname is' + catdbname)
         response_arr = self.run_sql(catalog_statement, catdbname)
-        print('check_catalog_if_node_exists response[1] is', str(response_arr[1]) )
+        #print('check_catalog_if_node_exists response[1] is', str(response_arr[1]) )
         # trim responses like '(1,)' to '1'
         response = self.trim_sql_response(response_arr[1]) 
-        print('check_catalog_if_node_exists trimmed response is', response)
+        #print('check_catalog_if_node_exists trimmed response is', response)
         return response
 
 #trim sql responses like '(1,)' to '1'
@@ -306,7 +303,6 @@ class SQLDriver:
 
     def send_node_sql(self, node_sql, dbhost, dbport, node_num, cat_db, node_db):
         print(self.caller_file + ': connecting to host ' + dbhost)
-
         my_socket = socket.socket()
         try:
             my_socket.connect((dbhost, dbport))
@@ -317,34 +313,16 @@ class SQLDriver:
             print(self.caller_file + ': send pickled data_array "' + '[%s]' % ', '.join(map(str, req_to_pickle)) + '"')   
             # my_socket.send(packet.encode())
             my_socket.send(data_string)
-
             data = my_socket.recv(1024)
             data_arr = pickle.loads(data)
-
             # return from Main() if no data was received
             if not data_arr:
                 return
             # data_arr = pickle.loads(data)
             # print(self.caller_file + ': recv array ' + repr(data_arr))
-
             dbfilename = data_arr[0]
-
             print(self.caller_file + ': recv msg ' + data_arr[0] + ' from host ' + dbhost)
             print(self.caller_file + ': recv sql rows' + data_arr[1] + ' from host ' + dbhost)
-
-            # get response list from parDBd
-
-#            if(data_arr[0] == 'success'):
-#                tname = self.get_table_name(node_sql)
-                # print('tname is ' + tname)
-#                cat_sql = 'DELETE FROM dtables WHERE nodeid='+ str(node_num) + ';'            
-#                if self.table_is_created(node_sql):
-                    # print ('node_sql is a create statement')
-                    # cat_sql = 'TRUNCATE TABLE tablename;'
-#                    cat_sql = 'INSERT INTO dtables VALUES ("'+ tname +'","","' + dbhost + '","","",0,' + str(node_num) + ',NULL,NULL,NULL)'
-#                self.run_sql(cat_sql, cat_db)
-                # print(self.caller_file + ' ' + cat_sql)
-                # print('')
         except OSError:
             print(self.caller_file + ' failed to connect to host ' + dbhost)
         my_socket.close()
