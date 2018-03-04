@@ -15,7 +15,7 @@ def main():
         node_sql = sys.argv[2]
         sql_driver = SQLDriver.SQLDriver(__file__, clustercfg)
 
-        #read ddlfile as a string to be executed as sql
+        #read sql file as string to be executed on each node using sql_driver.multiprocess_node_sql()
         with open(node_sql, 'r') as myfile:
             node_sql = myfile.read().replace('\n', '')
 

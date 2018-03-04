@@ -4,6 +4,7 @@
 import os, sys, inspect
 import SQLDriver
 from GetTablename import GetTablename
+import runSQL
 
 # https://stackoverflow.com/questions/279237/import-a-module-from-a-relative-path
 # realpath() will make your script run, even if you symlink it :)
@@ -50,8 +51,15 @@ def test_get_tablename(sql_filename):
     tablename = g.get_tablename(sql_filename)
     print('tablename test result is ', tablename)
 
+def test_run_sql():
+    print(__file__, ': test running runSQL.main()')
+    runSQL.main()
+    
+
 def tests(sql_driver):
-    test_get_tablename('books.sql')
+    print(__file__,': running tests')
+    test_run_sql()
+#    test_get_tablename('books.sql')
 #    test_create_books(sql_driver)
 #    test_insert_dtables(sql_driver):
 #    test_run(sql_driver)
@@ -67,8 +75,7 @@ def trim_partmtd(partmtd):
 def main():
     if(len(sys.argv) >= 3):
         try:
-            print('executing loadCSV')
-            print('load it up')
+            print(__file__,': executing loadCSV')
             clustercfg = sys.argv[1]
             csvfile = sys.argv[2]
             sql_driver = SQLDriver.SQLDriver(__file__, clustercfg)
@@ -81,25 +88,25 @@ def main():
             tuples = sql_driver.get_tuples_from_csv(csvfile)
 
             for current_node_num in range(1, int(sql_driver.cfg_dict['numnodes']) + 1):
-                partmtd = sql_driver.get_partmtd(current_node_num)
-                partmtd = trim_partmtd(partmtd)
+                partmtd = sql_driver.get_partmtd()
+                # partmtd = trim_partmtd(partmtd)
 
                 # print('current_node_num is :', current_node_num)
-                if(partmtd == '0'):
+                if(partmtd == 0):
                     print('send to every node')
                     print('tuples are ' + str(tuples))
-                    sql_driver.partition_all(tuples)
-                elif(partmtd == '1'):
+                    #sql_driver.partition_all(tuples)
+                elif(partmtd == 1):
                     print('send if value fits in node range')
                     print('tuples are ' + str(tuples))
-                    sql_driver.partition_range(tuples)
-                elif(partmtd == '2'):
+                    #sql_driver.partition_range(tuples)
+                elif(partmtd == 2):
                     print('mod value and send if mod matches node num')
-                    sql_driver.partition_hash(tuples)
+                    #sql_driver.partition_hash(tuples)
                 else:
                     print(__file__ + 'node ' + str(current_node_num) + ' returned an invalid partmtd value')
 
-            tests(sql_driver)
+            #tests(sql_driver)
 
             # return response_list
 

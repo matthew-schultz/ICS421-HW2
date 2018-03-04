@@ -152,13 +152,19 @@ class SQLDriver:
         print('select was ', value)
         return value
 
-    def get_partmtd(self, nodenum):
-        dbname = self.cfg_dict['catalog.db'] #MAGIC VALUE FOR NOW; CAN THIS BE CHANGED/IS THIS ROBUST?         
-        tablename = 'dtables'
-        valuename = 'partmtd'
-        where_col = 'nodeid'
-        partmtd = self.select_value_from_db(dbname, valuename, tablename, where_col, nodenum)
-        return partmtd
+    # return 0 if partition method field does not exist
+    def get_partmtd(self):
+        if('partition.method' in self.cfg_dict):
+            partmtd_string = self.cfg_dict['partition.method']
+            if(partmtd_string == 'range'):
+                return 1
+            if(partmtd_string == 'hash'):
+                return 2
+            else:
+                print ('partition.method was found in cfg_dict but did not match "range" or "hash"')
+                return 0
+        else:
+            return 0
 
     def get_tuples_from_csv(self, csv_filename):
         tuples = []
